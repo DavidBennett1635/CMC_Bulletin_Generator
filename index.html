@@ -1,0 +1,2703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Church Bulletin Data Entry</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 20px;
+            color: #202124;
+            background: #f4f6f8;
+        }
+
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        h1, h2 {
+            color: #26384a;
+        }
+
+        .toolbar, .field-row, .array-item, .array-toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .toolbar, .array-toolbar {
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .panel, .field, .array-item {
+            background: #fff;
+            border: 1px solid #d5dbe1;
+            border-radius: 6px;
+        }
+
+        .panel {
+            margin: 16px 0;
+            padding: 16px;
+        }
+
+        .field {
+            margin: 12px 0;
+            padding: 12px;
+        }
+
+        .prayer-group {
+            min-width: 0;
+            margin: 12px 0;
+            padding: 12px;
+            background: #e6edf4;
+            border: 2px solid #9aafc3;
+            border-radius: 6px;
+        }
+
+        .prayer-group legend {
+            padding: 0 6px;
+            color: #26384a;
+            font-weight: 600;
+        }
+
+        .field-row {
+            flex-direction: column;
+        }
+
+        .array-item {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+        }
+
+        .array-item .field {
+            border: 0;
+            margin: 0;
+            padding: 6px 0;
+        }
+
+        .hymn-fields {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .welcome-fields-table {
+            width: 100%;
+            margin: 12px 0;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        .welcome-fields-table td {
+            padding: 8px;
+            border: 1px solid #d5dbe1;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .scripture-entry {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+            gap: 10px;
+            align-items: start;
+            margin: 12px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 8px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 8px 12px;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .remove-button {
+            flex: 0 0 auto;
+        }
+
+        #status {
+            min-height: 1.5em;
+            margin-top: 8px;
+        }
+
+        .muted {
+            color: #53606d;
+        }
+
+        .bulletin-preview {
+            padding: 24px;
+            background: #fff;
+            border: 1px solid #d5dbe1;
+            color: #202124;
+        }
+
+        .bulletin-masthead {
+            text-align: center;
+        }
+
+        .bulletin-contact {
+            max-width: 650px;
+            margin: 0 auto 16px;
+            border-top: 1px solid #b9aa8b;
+            color: #555;
+            font-size: 20px;
+            text-align: left;
+        }
+
+        .bulletin-contact table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bulletin-contact td {
+            padding: 2px 6px;
+            vertical-align: top;
+        }
+
+        .bulletin-contact a {
+            color: inherit;
+        }
+
+        .bulletin-motto {
+            margin: 4px 0;
+        }
+
+        .bulletin-rule {
+            margin: 18px 0;
+            border: 0;
+            border-top: 1px solid #b9aa8b;
+        }
+
+        .bulletin-preview-field {
+            padding: 10px 0;
+            border-bottom: 1px solid #e3e7eb;
+        }
+
+        .bulletin-preview-field h3 {
+            margin: 0 0 6px;
+        }
+
+        .bulletin-preview-field p {
+            margin: 4px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .bulletin-preview-field ul {
+            margin: 6px 0;
+            padding-left: 24px;
+        }
+
+        .bulletin-preview-field dl {
+            margin: 0;
+        }
+
+        .bulletin-opening-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .bulletin-opening-table td {
+            padding: 2px 6px;
+        }
+
+        .bulletin-responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .bulletin-responsive-table td {
+            padding: 2px 6px;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .bulletin-responsive-table td:first-child {
+            width: 17%;
+        }
+
+        .bulletin-responsive-table .people-response {
+            font-weight: bold;
+        }
+
+        .bulletin-two-column-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .bulletin-two-column-table th,
+        .bulletin-two-column-table td {
+            width: 50%;
+            padding: 2px 6px;
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        .bulletin-preview-field dt {
+            font-weight: 600;
+        }
+
+        .bulletin-preview-field dd {
+            margin: 0 0 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .preview-empty {
+            color: #697783;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 14px;
+            }
+
+            .bulletin-preview {
+                padding: 14px;
+            }
+
+            .field-row {
+                flex-direction: column;
+            }
+
+            .hymn-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .scripture-entry {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Church Bulletin Data Entry</h1>
+    <p class="muted">Enter bulletin details below, or load an existing bulletin JSON file.</p>
+
+    <section class="panel" aria-label="Load and export bulletin data">
+        <div class="toolbar">
+            <label for="jsonFile">Bulletin data JSON</label>
+            <input id="jsonFile" type="file" accept=".json,application/json">
+            <button type="button" id="exportButton" disabled>Export JSON</button>
+            <button type="button" id="wordExportButton" disabled>Export to Microsoft Word</button>
+            <button type="button" id="pptExportButton" disabled>Export to Microsoft PP</button>
+            <button type="button" id="clearButton">Clear All Contents</button>
+        </div>
+        <div id="status" role="status" aria-live="polite">New bulletin ready.</div>
+    </section>
+
+    <form id="bulletinForm"></form>
+
+    <section class="panel" aria-label="Live bulletin preview">
+        <h2>Live Preview</h2>
+        <article class="bulletin-preview">
+            <header class="bulletin-masthead">
+                <header class="bulletin-contact">
+                    <table>
+                        <tr><td colspan="1">Address:</td><td colspan="3">600 Acadia Drive, Calgary, AB&nbsp; T2J 0B8 &nbsp;</td></tr>
+                        <tr><td colspan="1">Telephone:</td><td colspan="1">403-271-2700</td></tr>
+                        <tr><td colspan="1">Office hours:</td><td colspan="3">Monday&ndash;Friday, 9:00 a.m.&ndash;1:00 p.m.</td></tr>
+                        <tr><td colspan="1">email:</td><td colspan="1"><a href="mailto:moravian@nucleus.com">moravian@nucleus.com</a></td></tr>
+                        <tr><td colspan="1">webpage:</td><td colspan="1"><a href="https://www.christmoravian.com">www.christmoravian.com</a></td></tr>
+                    </table>
+                </header>
+                <p class="bulletin-motto">Christ Moravian Church</p>
+                <p class="bulletin-motto">Sunday Worship</p>
+                <p class="bulletin-motto">Our Lamb has conquered; let us follow Him.</p>
+            </header>
+            <hr class="bulletin-rule">
+            <div id="livePreviewContent">
+                <p class="muted">Your bulletin preview will appear here.</p>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        const form = document.getElementById("bulletinForm");
+        const fileInput = document.getElementById("jsonFile");
+        const exportButton = document.getElementById("exportButton");
+        const wordExportButton = document.getElementById("wordExportButton");
+        const pptExportButton = document.getElementById("pptExportButton");
+        const clearButton = document.getElementById("clearButton");
+        const status = document.getElementById("status");
+        const livePreviewContent = document.getElementById("livePreviewContent");
+        const multilineFields = new Set([
+            "worshipToday",
+            "callToWorship",
+            "gatheringPrayer",
+            "gatheringPrayer2",
+            "gatheringPrayer3",
+            "scriptureFocus",
+            "childrensMomentTxt",
+            "guestWelcomeText",
+            "text"
+        ]);
+        const gatheringPrayerHeadings = [
+            "Gathering Prayer",
+            "Call to Confession",
+            "Prayer of Confession",
+            "Declaration of Forgiveness"
+        ];
+        const gatheringPrayerFields = [
+            { key: "gatheringPrayer", headingKey: "gatheringPrayerHeading" },
+            { key: "gatheringPrayer2", headingKey: "gatheringPrayerHeading2" },
+            { key: "gatheringPrayer3", headingKey: "gatheringPrayerHeading3" }
+        ];
+        const gatheringPrayerKeys = new Set(gatheringPrayerFields.map(field => field.key));
+        const gatheringPrayerHeadingKeys = new Set(gatheringPrayerFields.map(field => field.headingKey));
+        const selectOptions = {
+            pastor: {
+                placeholder: "Select a pastor",
+                options: [
+                    "Rev. Michael Ward",
+                    "Rev. Mike Jones",
+                    "Rev. Bryan Beveridge",
+                    "Rev. Howard Mastin"
+                ]
+            },
+            elder: {
+                placeholder: "Select an elder",
+                options: [
+                    "Bernard Amiot",
+                    "Donna Gordon",
+                    "Holly Heffernan",
+                    "Jeff Pratt",
+                    "Gloria Taylor",
+                    "Gloria Toole",
+                    "Pat Wollf"
+                ]
+            }
+        };
+        function createEmptyBulletinData() {
+            return {
+                serviceDate: "",
+                pastor: "",
+                elder: "",
+                accompanists: [],
+                highlights: [],
+                specialMusic: "",
+                scriptureReader: "",
+                greeters: "",
+                coffeeService: "",
+                sundaySchool: "",
+                sanctuaryFlowers: "",
+                worshipToday: "",
+                preludeTxt: "",
+                introit: "",
+                callToWorship: "",
+                firstHymnNumber: "",
+                firstHymnBook: "",
+                firstHymnTitle: "",
+                gatheringPrayer: "",
+                gatheringPrayerHeading: "Gathering Prayer",
+                gatheringPrayer2: "",
+                gatheringPrayerHeading2: "",
+                gatheringPrayer3: "",
+                gatheringPrayerHeading3: "",
+                childrensMoment: "",
+                childrensMomentTxt: "",
+                scriptureReadings: [],
+                scriptureFocus: [],
+                offeringsOfTheDay: "",
+                anthem: "",
+                secondHymnNumber: "",
+                secondHymnBook: "",
+                secondHymnTitle: "",
+                sermonTitleTxt: "",
+                pastoralPrayer: "",
+                announcements: [],
+                thirdHymnNumber: "",
+                thirdHymnBook: "",
+                thirdHymnTitle: "",
+                benedictionTxt: "",
+                postludeTxt: "",
+                guestWelcomeText: ""
+            };
+        }
+
+        let bulletinData = createEmptyBulletinData();
+        let fileLoadVersion = 0;
+
+        function labelFor(key) {
+            const prayerField = gatheringPrayerFields.find(field => field.key === key);
+            if (prayerField) return bulletinData[prayerField.headingKey] || "Gathering Prayer";
+            if (key === "childrensMoment") return "Children's Moment Leader";
+            if (key === "sundaySchool") return "Sunday School leader";
+            if (key === "preludeTxt") return "Prelude";
+            if (key === "benedictionTxt") return "Benediction Prayer";
+            if (key === "postludeTxt") return "Postlude music";
+            if (key === "scriptureFocus") return "Scripture focus";
+            if (key === "sermonTitleTxt") return "Sermon Title";
+            return key
+                .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+                .replace(/Txt$/, " Text")
+                .replace(/^./, character => character.toUpperCase());
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        function renderPreviewValue(value) {
+            if (Array.isArray(value)) {
+                return value.length
+                    ? `<ul>${value.map(item => `<li>${renderPreviewValue(item)}</li>`).join("")}</ul>`
+                    : `<span class="preview-empty">—</span>`;
+            }
+            if (value && typeof value === "object") {
+                return `<dl>${Object.entries(value).map(([key, childValue]) => `
+                    <dt>${escapeHtml(labelFor(key))}</dt>
+                    <dd>${renderPreviewValue(childValue)}</dd>
+                `).join("")}</dl>`;
+            }
+            const text = value == null ? "" : String(value);
+            return text.trim()
+                ? escapeHtml(text).replace(/\r?\n/g, "<br>")
+                : `<span class="preview-empty">—</span>`;
+        }
+
+        function openingMusicDisplayValue(value) {
+            return value == null ? "" : String(value).replace(/\r\n?|\n/g, " ");
+        }
+
+        function responsiveReadingRows(value) {
+            const text = value == null ? "" : String(value);
+            if (!text.trim()) return [];
+            return text.split(/\r?\n/).map(line => {
+                const match = line.match(/^\s*(Leader|People):[ \t]*/i);
+                return match
+                    ? [`${match[1]}:`, line.slice(match[0].length)]
+                    : ["", line];
+            });
+        }
+
+        function isPeopleResponse(role) {
+            return role.toLowerCase() === "people:";
+        }
+
+        function renderResponsiveReadingPreview(value, label) {
+            const rows = responsiveReadingRows(value);
+            if (!rows.length) return renderPreviewValue(value);
+            return `<table class="bulletin-responsive-table" aria-label="${escapeHtml(label)}">
+                <tbody>${rows.map(([role, text]) => `
+                    <tr${isPeopleResponse(role) ? ' class="people-response"' : ""}><td>${escapeHtml(role)}</td><td>${text ? escapeHtml(text) : "&nbsp;"}</td></tr>
+                `).join("")}</tbody>
+            </table>`;
+        }
+
+        function scriptureReadingRows() {
+            const readings = Array.isArray(bulletinData.scriptureReadings)
+                ? bulletinData.scriptureReadings
+                : [];
+            const focuses = Array.isArray(bulletinData.scriptureFocus)
+                ? bulletinData.scriptureFocus
+                : [];
+            return readings.length
+                ? readings.map((reading, index) => [reading, focuses[index]])
+                : [["", ""]];
+        }
+
+        const scriptureTableHeaders = ["Scripture Readings", "Scripture focus"];
+        const announcementTableHeaders = ["Date", "Description"];
+
+        function announcementRows() {
+            const announcements = Array.isArray(bulletinData.announcements)
+                ? bulletinData.announcements
+                : [];
+            return announcements.length
+                ? announcements.map(announcement =>
+                    announcement && typeof announcement === "object" && !Array.isArray(announcement)
+                        ? [announcement.date, announcement.text]
+                        : ["", announcement]
+                )
+                : [["", ""]];
+        }
+
+        function renderTwoColumnPreview(label, headers, rows) {
+            return `
+                <table class="bulletin-two-column-table" aria-label="${escapeHtml(label)}">
+                    <thead><tr>${headers.map(header => `<th scope="col">${escapeHtml(header)}</th>`).join("")}</tr></thead>
+                    <tbody>${rows.map(row => `
+                        <tr>${row.map(value => `<td>${renderPreviewValue(value)}</td>`).join("")}</tr>
+                    `).join("")}</tbody>
+                </table>
+            `;
+        }
+
+        function renderScripturePreview() {
+            return `
+                <section class="bulletin-preview-field">
+                    ${renderTwoColumnPreview("Scripture readings", scriptureTableHeaders, scriptureReadingRows())}
+                </section>
+            `;
+        }
+
+        function renderAnnouncementsPreview() {
+            return `
+                <section class="bulletin-preview-field">
+                    <h3>Announcements</h3>
+                    ${renderTwoColumnPreview("Announcements", announcementTableHeaders, announcementRows())}
+                </section>
+            `;
+        }
+
+        function formatHymnLine(prefix) {
+            const number = openingMusicDisplayValue(bulletinData[`${prefix}HymnNumber`]).trim();
+            const book = openingMusicDisplayValue(bulletinData[`${prefix}HymnBook`]).trim();
+            let title = openingMusicDisplayValue(bulletinData[`${prefix}HymnTitle`]).trim();
+            const verseMatch = title.match(/^(.*?)\s+(\(\s*vs?\.?\s*[\d,\s–—-]+\)|vs?\.?\s*[\d,\s–—-]+)$/i);
+            const verses = verseMatch ? verseMatch[2] : "";
+            if (verseMatch) title = verseMatch[1].trim();
+            title = title.replace(/^["“](.*)["”]$/, "$1");
+            const parts = [
+                number ? `# ${number}` : "",
+                book,
+                title ? `“${title}”` : "",
+                verses
+            ].filter(Boolean);
+            return `Hymn: ${parts.length ? parts.join(" ") : "—"}`;
+        }
+
+        function updateLivePreview() {
+            if (!bulletinData) {
+                livePreviewContent.innerHTML = '<p class="muted">Load a bulletin JSON file to see its preview.</p>';
+                return;
+            }
+
+            let openingSectionRendered = false;
+            livePreviewContent.innerHTML = Object.entries(bulletinData)
+                .map(([key, value]) => {
+                    if (gatheringPrayerHeadingKeys.has(key)) return "";
+                    if (gatheringPrayerKeys.has(key)) {
+                        if (key !== "gatheringPrayer") return "";
+                        return gatheringPrayerFields
+                            .filter((field, index) => index === 0 || bulletinData[field.headingKey])
+                            .map(field => `
+                                <section class="bulletin-preview-field">
+                                    <h3>${escapeHtml(labelFor(field.key))}</h3>
+                                    ${renderResponsiveReadingPreview(bulletinData[field.key], labelFor(field.key))}
+                                </section>
+                            `).join("");
+                    }
+                    if (key === "scriptureFocus") return "";
+                    if (key === "scriptureReadings") return renderScripturePreview();
+                    if (key === "announcements") return renderAnnouncementsPreview();
+                    if (key === "preludeTxt" || key === "introit" || key === "callToWorship") {
+                        if (openingSectionRendered) return "";
+                        openingSectionRendered = true;
+                        return `
+                            <section class="bulletin-preview-field">
+                                <p><strong>Prelude: </strong>${renderPreviewValue(openingMusicDisplayValue(bulletinData.preludeTxt))}</p>
+                                <p><strong>Introit: </strong>${renderPreviewValue(openingMusicDisplayValue(bulletinData.introit))}</p>
+                                <table class="bulletin-opening-table" aria-label="Welcome and worship opening">
+                                    <tbody>${welcomeLabels.map(label => `<tr><td>• ${escapeHtml(label)}</td></tr>`).join("")}</tbody>
+                                </table>
+                            </section>
+                            <section class="bulletin-preview-field">
+                                <h3>Call To Worship</h3>
+                                ${renderResponsiveReadingPreview(bulletinData.callToWorship, "Call to Worship")}
+                            </section>
+                        `;
+                    }
+                    if (key === "firstHymnNumber" || key === "secondHymnNumber" || key === "thirdHymnNumber") {
+                        const prefix = key.slice(0, -"HymnNumber".length);
+                        return `<section class="bulletin-preview-field"><p>${escapeHtml(formatHymnLine(prefix))}</p></section>`;
+                    }
+                    if (key === "firstHymnBook" || key === "firstHymnTitle") return "";
+                    if (key === "secondHymnBook" || key === "secondHymnTitle") return "";
+                    if (key === "thirdHymnBook" || key === "thirdHymnTitle") return "";
+                    return `
+                        <section class="bulletin-preview-field">
+                            <h3>${escapeHtml(labelFor(key))}</h3>
+                            ${renderPreviewValue(value)}
+                        </section>
+                    `;
+                })
+                .join("");
+        }
+
+        const wordPageWidthTwips = 7937;
+        const wordPageHeightTwips = 15840;
+        const wordPageMarginTwips = 720;
+        const wordContentWidthTwips = wordPageWidthTwips - 2 * wordPageMarginTwips;
+        const welcomeLabels = [
+            "Words Of Welcome",
+            "Sharing Christs Peace",
+            "Lighting Christ Candle"
+        ];
+
+        function wordRun(text, options) {
+            const settings = options || {};
+            const fontSize = settings.fontSize || 22;
+            const runProperties = [
+                '<w:rFonts w:ascii="Verdana Pro" w:hAnsi="Verdana Pro" w:eastAsia="Verdana Pro" w:cs="Verdana Pro"/>',
+                settings.bold ? "<w:b/>" : "",
+                settings.italic ? "<w:i/>" : "",
+                `<w:sz w:val="${fontSize}"/><w:szCs w:val="${fontSize}"/>`
+            ].join("");
+            const runs = String(text).split(/\r?\n/).map((line, index) =>
+                `${index ? "<w:br/>" : ""}<w:t xml:space="preserve">${escapeHtml(line)}</w:t>`
+            ).join("");
+            return `<w:r>${runProperties ? `<w:rPr>${runProperties}</w:rPr>` : ""}${runs}</w:r>`;
+        }
+
+        function wordParagraph(text, options) {
+            const settings = options || {};
+            const paragraphProperties = [
+                settings.after != null ? `<w:spacing w:after="${settings.after}"/>` : "",
+                settings.indent ? `<w:ind w:left="${settings.indent}"/>` : "",
+                settings.align ? `<w:jc w:val="${settings.align}"/>` : ""
+            ].join("");
+            return `<w:p>${paragraphProperties ? `<w:pPr>${paragraphProperties}</w:pPr>` : ""}${wordRun(text, settings)}</w:p>`;
+        }
+
+        function wordCell(text, width, bold, gridSpan, widthType, fontSize) {
+            const span = gridSpan ? `<w:gridSpan w:val="${gridSpan}"/>` : "";
+            return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="${widthType || "dxa"}"/>${span}</w:tcPr>${wordParagraph(
+                text,
+                { bold: Boolean(bold), after: 0, fontSize }
+            )}</w:tc>`;
+        }
+
+        function wordWelcomeTable() {
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${wordContentWidthTwips}" w:type="dxa"/>
+                        <w:tblBorders>
+                            <w:top w:val="nil"/><w:left w:val="nil"/>
+                            <w:bottom w:val="nil"/><w:right w:val="nil"/>
+                            <w:insideH w:val="nil"/><w:insideV w:val="nil"/>
+                        </w:tblBorders>
+                    </w:tblPr>
+                    <w:tblGrid><w:gridCol w:w="${wordContentWidthTwips}"/></w:tblGrid>
+                    ${welcomeLabels.map(label => `<w:tr>${wordCell(`• ${label}`, wordContentWidthTwips, false)}</w:tr>`).join("")}
+                </w:tbl>
+            `;
+        }
+
+        function wordResponsiveReadingTable(rows) {
+            const labelWidth = 1100;
+            const textWidth = wordContentWidthTwips - labelWidth;
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${wordContentWidthTwips}" w:type="dxa"/>
+                        <w:tblLayout w:type="fixed"/>
+                        <w:tblBorders>
+                            <w:top w:val="nil"/><w:left w:val="nil"/>
+                            <w:bottom w:val="nil"/><w:right w:val="nil"/>
+                            <w:insideH w:val="nil"/><w:insideV w:val="nil"/>
+                        </w:tblBorders>
+                    </w:tblPr>
+                    <w:tblGrid><w:gridCol w:w="${labelWidth}"/><w:gridCol w:w="${textWidth}"/></w:tblGrid>
+                    ${rows.map(([role, text]) => `
+                        <w:tr>${wordCell(role, labelWidth, isPeopleResponse(role))}${wordCell(text, textWidth, isPeopleResponse(role))}</w:tr>
+                    `).join("")}
+                </w:tbl>
+            `;
+        }
+
+        function wordContactTable() {
+            const rows = [
+                ["Address:", "600 Acadia Drive, Calgary, AB  T2J 0B8"],
+                ["Telephone:", "403-271-2700"],
+                ["Office hours:", "Monday\u2013Friday, 9:00 a.m.\u20131:00 p.m."],
+                ["email:", "moravian@nucleus.com"],
+                ["webpage:", "www.christmoravian.com"]
+            ];
+            const labelWidth = 1200;
+            const valueWidth = wordContentWidthTwips - labelWidth;
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${wordContentWidthTwips}" w:type="dxa"/>
+                        <w:tblBorders>
+                            <w:top w:val="nil"/><w:left w:val="nil"/>
+                            <w:bottom w:val="nil"/><w:right w:val="nil"/>
+                            <w:insideH w:val="nil"/><w:insideV w:val="nil"/>
+                        </w:tblBorders>
+                    </w:tblPr>
+                    <w:tblGrid><w:gridCol w:w="${labelWidth}"/><w:gridCol w:w="${valueWidth}"/></w:tblGrid>
+                    ${rows.map(([label, value]) => `
+                        <w:tr>${wordCell(label, labelWidth, true)}${wordCell(value, valueWidth, false)}</w:tr>
+                    `).join("")}
+                </w:tbl>
+            `;
+        }
+
+        function wordTableValue(value) {
+            if (Array.isArray(value)) {
+                return value.length
+                    ? value.map(item => item == null || String(item).trim() === "" ? "—" : String(item)).join(", ")
+                    : "—";
+            }
+            return value == null || String(value).trim() === "" ? "—" : String(value);
+        }
+
+        function wordTwoColumnTable(headers, rows) {
+            const firstWidth = Math.floor(wordContentWidthTwips / 2);
+            const secondWidth = wordContentWidthTwips - firstWidth;
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${wordContentWidthTwips}" w:type="dxa"/>
+                        <w:tblLayout w:type="fixed"/>
+                        <w:tblBorders>
+                            <w:top w:val="nil"/><w:left w:val="nil"/>
+                            <w:bottom w:val="nil"/><w:right w:val="nil"/>
+                            <w:insideH w:val="nil"/><w:insideV w:val="nil"/>
+                        </w:tblBorders>
+                    </w:tblPr>
+                    <w:tblGrid><w:gridCol w:w="${firstWidth}"/><w:gridCol w:w="${secondWidth}"/></w:tblGrid>
+                    <w:tr>${wordCell(headers[0], firstWidth, true)}${wordCell(headers[1], secondWidth, true)}</w:tr>
+                    ${rows.map(([first, second]) => `
+                        <w:tr>${wordCell(wordTableValue(first), firstWidth, false)}${wordCell(wordTableValue(second), secondWidth, false)}</w:tr>
+                    `).join("")}
+                </w:tbl>
+            `;
+        }
+
+        function wordBulletinDetailsTable() {
+            const keys = [
+                "pastor",
+                "elder",
+                "accompanists",
+                "highlights",
+                "specialMusic",
+                "scriptureReader",
+                "greeters",
+                "coffeeService",
+                "childrensMoment",
+                "sundaySchool",
+                "sanctuaryFlowers"
+            ];
+            const tableWidthPercent = 2500;
+            const labelWidthPercent = 2100;
+            const valueWidthPercent = 2800;
+            const tableWidthTwips = Math.round(wordContentWidthTwips / 2);
+            const labelWidthTwips = Math.round(tableWidthTwips * 0.42);
+            const valueWidthTwips = Math.round(tableWidthTwips * 0.56);
+            const rows = keys.map(key => `
+                <w:tr>
+                    ${wordCell(labelFor(key), labelWidthPercent, true, null, "pct", 16)}
+                    ${wordCell(wordTableValue(bulletinData[key]), valueWidthPercent, false, null, "pct")}
+                </w:tr>
+            `);
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblpPr
+                            w:horzAnchor="margin" w:tblpX="0"
+                            w:vertAnchor="text" w:tblpY="0"
+                            w:leftFromText="0" w:rightFromText="283"
+                            w:bottomFromText="283"/>
+                        <w:tblW w:w="${tableWidthPercent}" w:type="pct"/>
+                        <w:tblLayout w:type="fixed"/>
+                        <w:tblBorders>
+                            <w:top w:val="single" w:sz="4" w:color="D5DBE1"/>
+                            <w:left w:val="single" w:sz="4" w:color="D5DBE1"/>
+                            <w:bottom w:val="single" w:sz="4" w:color="D5DBE1"/>
+                            <w:right w:val="single" w:sz="4" w:color="D5DBE1"/>
+                            <w:insideH w:val="single" w:sz="4" w:color="D5DBE1"/>
+                            <w:insideV w:val="single" w:sz="4" w:color="D5DBE1"/>
+                        </w:tblBorders>
+                        <w:tblCellMar>
+                            <w:top w:w="60" w:type="dxa"/><w:left w:w="80" w:type="dxa"/>
+                            <w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/>
+                        </w:tblCellMar>
+                    </w:tblPr>
+                    <w:tblGrid>
+                        <w:gridCol w:w="${labelWidthTwips}"/><w:gridCol w:w="${valueWidthTwips}"/>
+                    </w:tblGrid>
+                    ${rows.join("")}
+                </w:tbl>
+            `;
+        }
+
+        function formatServiceDate(value) {
+            const text = value == null ? "" : String(value).trim();
+            if (!text) return "";
+
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            const namedDate = text.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+            let date;
+
+            if (isoDate) {
+                date = new Date(Date.UTC(
+                    Number(isoDate[1]),
+                    Number(isoDate[2]) - 1,
+                    Number(isoDate[3])
+                ));
+            } else if (namedDate) {
+                const month = monthNames.findIndex(
+                    name => name.toLowerCase() === namedDate[1].toLowerCase()
+                );
+                if (month >= 0) {
+                    date = new Date(Date.UTC(
+                        Number(namedDate[3]),
+                        month,
+                        Number(namedDate[2])
+                    ));
+                }
+            }
+
+            if (!date) {
+                const parsed = new Date(text);
+                if (Number.isNaN(parsed.getTime())) return text;
+                date = parsed;
+            }
+
+            return new Intl.DateTimeFormat("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                timeZone: "UTC"
+            }).format(date);
+        }
+
+        function wordValueParagraphs(value, depth) {
+            const indent = 240 + depth * 240;
+            if (Array.isArray(value)) {
+                if (!value.length) return [wordParagraph("—", { indent })];
+                return value.flatMap(item => {
+                    if (item && typeof item === "object") {
+                        return wordValueParagraphs(item, depth + 1);
+                    }
+                    const text = item == null || String(item).trim() === "" ? "—" : String(item);
+                    return [wordParagraph(`• ${text}`, { indent })];
+                });
+            }
+            if (value && typeof value === "object") {
+                return Object.entries(value).flatMap(([key, childValue]) => [
+                    wordParagraph(`${labelFor(key)}:`, { bold: true, indent }),
+                    ...wordValueParagraphs(childValue, depth + 1)
+                ]);
+            }
+            const text = value == null || String(value).trim() === "" ? "—" : String(value);
+            return [wordParagraph(text, { indent })];
+        }
+
+        function createWordDocumentXml() {
+            const body = [
+                wordContactTable(),
+                wordParagraph("Christ Moravian Church", {
+                    align: "center",
+                    bold: true,
+                    after: 40
+                }),
+                wordParagraph("Sunday Worship", {
+                    align: "center",
+                    bold: true,
+                    after: 40
+                }),
+                wordParagraph("Our Lamb has conquered; let us follow Him.", {
+                    align: "center",
+                    italic: true,
+                    after: 160
+                }),
+                wordBulletinDetailsTable(),
+                wordParagraph("", { after: 120 })
+            ];
+
+            const tableFieldKeys = new Set([
+                "pastor",
+                "elder",
+                "scriptureReader",
+                "accompanists",
+                "highlights",
+                "specialMusic",
+                "greeters",
+                "coffeeService",
+                "childrensMoment",
+                "sundaySchool",
+                "sanctuaryFlowers",
+                "scriptureFocus"
+            ]);
+            let openingSectionRendered = false;
+            function appendOpeningSection() {
+                for (const key of ["preludeTxt", "introit", "callToWorship"]) {
+                    if (key === "preludeTxt" || key === "introit") {
+                        body.push(`<w:p><w:pPr><w:spacing w:after="40"/></w:pPr>${wordRun(
+                            `${labelFor(key)}: `,
+                            { bold: true }
+                        )}${wordRun(wordTableValue(openingMusicDisplayValue(bulletinData[key])))}</w:p>`);
+                        continue;
+                    }
+                    if (key === "callToWorship") {
+                        body.push(wordWelcomeTable());
+                    }
+                    body.push(wordParagraph(labelFor(key), { bold: true, after: 40 }));
+                    const rows = key === "callToWorship" ? responsiveReadingRows(bulletinData[key]) : [];
+                    if (rows.length) {
+                        body.push(wordResponsiveReadingTable(rows));
+                    } else {
+                        body.push(...wordValueParagraphs(bulletinData[key], 0));
+                    }
+                }
+                openingSectionRendered = true;
+            }
+            for (const [key, value] of Object.entries(bulletinData)) {
+                if (gatheringPrayerHeadingKeys.has(key)) continue;
+                if (gatheringPrayerKeys.has(key)) {
+                    if (key === "gatheringPrayer") {
+                        gatheringPrayerFields.forEach((field, index) => {
+                            if (index && !bulletinData[field.headingKey]) return;
+                            body.push(wordParagraph(labelFor(field.key), { bold: true, after: 40 }));
+                            const rows = responsiveReadingRows(bulletinData[field.key]);
+                            if (rows.length) {
+                                body.push(wordResponsiveReadingTable(rows));
+                            } else {
+                                body.push(...wordValueParagraphs(bulletinData[field.key], 0));
+                            }
+                        });
+                    }
+                    continue;
+                }
+                if (tableFieldKeys.has(key)) continue;
+                if (key === "preludeTxt" || key === "introit" || key === "callToWorship") {
+                    if (!openingSectionRendered) appendOpeningSection();
+                    continue;
+                }
+                if (key === "firstHymnNumber" || key === "secondHymnNumber" || key === "thirdHymnNumber") {
+                    const prefix = key.slice(0, -"HymnNumber".length);
+                    body.push(wordParagraph(formatHymnLine(prefix), { after: 40 }));
+                    continue;
+                }
+                if (key === "firstHymnBook" || key === "firstHymnTitle") continue;
+                if (key === "secondHymnBook" || key === "secondHymnTitle") continue;
+                if (key === "thirdHymnBook" || key === "thirdHymnTitle") continue;
+                if (key === "scriptureReadings") {
+                    if (body[body.length - 1].trimStart().startsWith("<w:tbl>")) {
+                        // Keep adjacent Word tables separate without adding a visible blank line.
+                        body.push('<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>');
+                    }
+                    body.push(wordTwoColumnTable(scriptureTableHeaders, scriptureReadingRows()));
+                    continue;
+                }
+                body.push(wordParagraph(labelFor(key), { bold: true, after: 40 }));
+                if (key === "announcements") {
+                    body.push(wordTwoColumnTable(announcementTableHeaders, announcementRows()));
+                } else if (key === "serviceDate") {
+                    body.push(...wordValueParagraphs(formatServiceDate(value), 0));
+                } else {
+                    body.push(...wordValueParagraphs(value, 0));
+                }
+            }
+
+            if (!openingSectionRendered) appendOpeningSection();
+
+            body.push(`
+                <w:sectPr>
+                    <w:pgSz w:w="${wordPageWidthTwips}" w:h="${wordPageHeightTwips}"/>
+                    <w:pgMar w:top="${wordPageMarginTwips}" w:right="${wordPageMarginTwips}"
+                        w:bottom="${wordPageMarginTwips}" w:left="${wordPageMarginTwips}"
+                        w:header="360" w:footer="360" w:gutter="0"/>
+                </w:sectPr>
+            `);
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+                    <w:body>${body.join("")}</w:body>
+                </w:document>`;
+        }
+
+        function calculateCrc32(bytes) {
+            let crc = 0xffffffff;
+            for (const byte of bytes) {
+                crc ^= byte;
+                for (let bit = 0; bit < 8; bit += 1) {
+                    crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+                }
+            }
+            return (crc ^ 0xffffffff) >>> 0;
+        }
+
+        function createZipBlob(files, mimeType) {
+            const encoder = new TextEncoder();
+            const localParts = [];
+            const centralParts = [];
+            let localOffset = 0;
+            let centralSize = 0;
+
+            files.forEach(file => {
+                const name = encoder.encode(file.name);
+                const data = encoder.encode(file.content.trim());
+                const checksum = calculateCrc32(data);
+                const localHeader = new Uint8Array(30 + name.length);
+                const localView = new DataView(localHeader.buffer);
+                localView.setUint32(0, 0x04034b50, true);
+                localView.setUint16(4, 20, true);
+                localView.setUint16(6, 0x0800, true);
+                localView.setUint16(8, 0, true);
+                localView.setUint16(10, 0, true);
+                localView.setUint16(12, 0x0021, true);
+                localView.setUint32(14, checksum, true);
+                localView.setUint32(18, data.length, true);
+                localView.setUint32(22, data.length, true);
+                localView.setUint16(26, name.length, true);
+                localView.setUint16(28, 0, true);
+                localHeader.set(name, 30);
+                localParts.push(localHeader, data);
+
+                const centralHeader = new Uint8Array(46 + name.length);
+                const centralView = new DataView(centralHeader.buffer);
+                centralView.setUint32(0, 0x02014b50, true);
+                centralView.setUint16(4, 20, true);
+                centralView.setUint16(6, 20, true);
+                centralView.setUint16(8, 0x0800, true);
+                centralView.setUint16(10, 0, true);
+                centralView.setUint16(12, 0, true);
+                centralView.setUint16(14, 0x0021, true);
+                centralView.setUint32(16, checksum, true);
+                centralView.setUint32(20, data.length, true);
+                centralView.setUint32(24, data.length, true);
+                centralView.setUint16(28, name.length, true);
+                centralView.setUint16(30, 0, true);
+                centralView.setUint16(32, 0, true);
+                centralView.setUint16(34, 0, true);
+                centralView.setUint16(36, 0, true);
+                centralView.setUint32(38, 0, true);
+                centralView.setUint32(42, localOffset, true);
+                centralHeader.set(name, 46);
+                centralParts.push(centralHeader);
+
+                localOffset += localHeader.length + data.length;
+                centralSize += centralHeader.length;
+            });
+
+            const endRecord = new Uint8Array(22);
+            const endView = new DataView(endRecord.buffer);
+            endView.setUint32(0, 0x06054b50, true);
+            endView.setUint16(4, 0, true);
+            endView.setUint16(6, 0, true);
+            endView.setUint16(8, files.length, true);
+            endView.setUint16(10, files.length, true);
+            endView.setUint32(12, centralSize, true);
+            endView.setUint32(16, localOffset, true);
+            endView.setUint16(20, 0, true);
+
+            return new Blob([...localParts, ...centralParts, endRecord], {
+                type: mimeType
+            });
+        }
+
+        function createDocxBlob() {
+            const files = [
+                {
+                    name: "[Content_Types].xml",
+                    content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+                            <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+                            <Default Extension="xml" ContentType="application/xml"/>
+                            <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+                        </Types>`
+                },
+                {
+                    name: "_rels/.rels",
+                    content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                            <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+                        </Relationships>`
+                },
+                { name: "word/document.xml", content: createWordDocumentXml() }
+            ];
+            return createZipBlob(
+                files,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            );
+        }
+
+        const pptDefaultFont = "Verdana Pro";
+        const pptDefaultFontSize = 1800;
+        const pptDefaultRunProperties = `<a:defRPr lang="en-US" sz="${pptDefaultFontSize}" cap="small"><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="${pptDefaultFont}"/></a:defRPr>`;
+
+        function pptRun(text, settings) {
+            const size = settings.size || pptDefaultFontSize;
+            const color = settings.color || "000000";
+            let rPrXml = `<a:rPr lang="en-US" sz="${size}"`;
+            if (settings.bold) rPrXml += ` b="1"`;
+            if (settings.italic) rPrXml += ` i="1"`;
+            if (settings.smallCaps !== false) rPrXml += ` cap="small"`;
+            rPrXml += `><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="${pptDefaultFont}"/></a:rPr>`;
+            return `<a:r>${rPrXml}<a:t xml:space="preserve">${escapeHtml(text)}</a:t></a:r>`;
+        }
+
+        function pptParagraph(text, options) {
+            const settings = options || {};
+            const size = settings.size || pptDefaultFontSize;
+            
+            let pPrXml = "";
+            if (settings.align || settings.indent != null || settings.firstLineIndent != null || settings.tabStop != null || settings.lineSpacing != null || settings.after != null) {
+                pPrXml = `<a:pPr${settings.align ? ` algn="${settings.align}"` : ""}${settings.indent != null ? ` marL="${settings.indent}"` : ""}${settings.firstLineIndent != null ? ` indent="${settings.firstLineIndent}"` : ""}>`;
+                if (settings.lineSpacing != null) {
+                    pPrXml += `<a:lnSpc><a:spcPct val="${settings.lineSpacing}"/></a:lnSpc>`;
+                }
+                if (settings.after != null) {
+                    pPrXml += `<a:spcAft><a:spcPts val="${settings.after}"/></a:spcAft>`;
+                }
+                if (settings.tabStop != null) {
+                    pPrXml += `<a:tabLst><a:tab pos="${settings.tabStop}" algn="l"/></a:tabLst>`;
+                }
+                pPrXml += `</a:pPr>`;
+            }
+            
+            const prefix = settings.prefix ? pptRun(settings.prefix.text, settings.prefix) : "";
+            return `<a:p>${pPrXml}${prefix}${pptRun(text, settings)}<a:endParaRPr lang="en-US" sz="${size}"/></a:p>`;
+        }
+
+        function pptTextShape(id, name, x, y, width, height, paragraphs, fillColor) {
+            return `
+                <p:sp>
+                    <p:nvSpPr>
+                        <p:cNvPr id="${id}" name="${escapeHtml(name)}"/>
+                        <p:cNvSpPr txBox="1"/>
+                        <p:nvPr/>
+                    </p:nvSpPr>
+                    <p:spPr>
+                        <a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${width}" cy="${height}"/></a:xfrm>
+                        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                        ${fillColor
+                            ? `<a:solidFill><a:srgbClr val="${fillColor}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="D5DBE1"/></a:solidFill></a:ln>`
+                            : "<a:noFill/><a:ln><a:noFill/></a:ln>"}
+                    </p:spPr>
+                    <p:txBody>
+                        <a:bodyPr wrap="square" lIns="100000" tIns="50000" rIns="100000" bIns="50000" anchor="t"><a:normAutofit/></a:bodyPr>
+                        <a:lstStyle/>
+                        ${paragraphs.join("")}
+                    </p:txBody>
+                </p:sp>
+            `;
+        }
+
+        function pptSlideXml(shapes) {
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+                    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                    xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+                    <p:cSld><p:spTree>
+                        <p:nvGrpSpPr>
+                            <p:cNvPr id="1" name=""/>
+                            <p:cNvGrpSpPr/><p:nvPr/>
+                        </p:nvGrpSpPr>
+                        <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+                        ${shapes.join("")}
+                    </p:spTree></p:cSld>
+                    <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+                </p:sld>`;
+        }
+
+        function pptValueText(value) {
+            if (Array.isArray(value)) {
+                if (!value.length) return "—";
+                return value.map(item => item && typeof item === "object"
+                    ? Object.entries(item)
+                        .map(([key, childValue]) => `${labelFor(key)}: ${pptValueText(childValue)}`)
+                        .join("\n")
+                    : `• ${item == null || String(item).trim() === "" ? "—" : item}`
+                ).join("\n");
+            }
+            if (value && typeof value === "object") {
+                return Object.entries(value)
+                    .map(([key, childValue]) => `${labelFor(key)}: ${pptValueText(childValue)}`)
+                    .join("\n");
+            }
+            return value == null || String(value).trim() === "" ? "—" : String(value);
+        }
+
+        const pptDetailsKeys = [
+            "pastor", "elder", "accompanists", "highlights",
+            "specialMusic", "scriptureReader", "greeters", "coffeeService",
+            "sundaySchool", "sanctuaryFlowers", "childrensMoment"
+        ];
+
+        function createPptContentBlocks() {
+            const blocks = [];
+            for (const [key, value] of Object.entries(bulletinData)) {
+                if (gatheringPrayerHeadingKeys.has(key)) continue;
+                if (gatheringPrayerKeys.has(key)) {
+                    if (key === "gatheringPrayer") {
+                        gatheringPrayerFields.forEach(field => {
+                            if (bulletinData[field.headingKey]) {
+                                blocks.push({
+                                    key: field.key,
+                                    title: labelFor(field.key),
+                                    text: pptValueText(bulletinData[field.key])
+                                });
+                            }
+                        });
+                    }
+                    continue;
+                }
+                if (key === "serviceDate" || pptDetailsKeys.includes(key)) continue;
+                if (key === "introit") continue;
+                if (key === "preludeTxt") {
+                    blocks.push({ key, title: labelFor(key), text: pptValueText(value) });
+                    blocks.push({ key: "introit", title: labelFor("introit"), text: pptValueText(bulletinData.introit) });
+                    continue;
+                }
+                const hymnField = key.match(/^(first|second|third)Hymn(Number|Book|Title)$/);
+                if (hymnField) {
+                    if (hymnField[2] === "Number") {
+                        const text = ["Number", "Book", "Title"]
+                            .map(part => pptValueText(openingMusicDisplayValue(bulletinData[`${hymnField[1]}Hymn${part}`]).trim()))
+                            .join(" ");
+                        blocks.push({ key, title: "Hymn #", text });
+                    }
+                    continue;
+                }
+                if (key === "scriptureFocus") continue;
+                if (key === "scriptureReadings") {
+                    scriptureReadingRows().forEach(([reading, focus], index) => {
+                        const verseText = pptValueText(reading);
+                        const focusText = pptValueText(focus);
+                        blocks.push({
+                            key,
+                            title: `Scripture Readings ${index + 1}`,
+                            text: `Verse: ${verseText}\nScripture focus: ${focusText}`,
+                            verseText,
+                            focusText
+                        });
+                    });
+                    continue;
+                }
+                if (key === "announcements") {
+                    const announcements = Array.isArray(value) ? value : [value];
+                    const rows = Array.isArray(value) ? announcementRows() : [["", value]];
+                    rows.forEach(([date, description], index) => {
+                        const announcement = announcements[index];
+                        const extraFields = announcement && typeof announcement === "object" && !Array.isArray(announcement)
+                            ? Object.entries(announcement)
+                                .filter(([field]) => field !== "date" && field !== "text")
+                                .map(([field, fieldValue]) => `${labelFor(field)}: ${pptValueText(fieldValue)}`)
+                            : [];
+                        const descriptionText = [pptValueText(description), ...extraFields].join("\n");
+                        blocks.push({
+                            key,
+                            title: announcements.length ? `Announcements ${index + 1}` : "Announcements",
+                            text: announcements.length ? pptValueText(announcement) : "—",
+                            dateText: pptValueText(date),
+                            descriptionText
+                        });
+                    });
+                    continue;
+                }
+                blocks.push({ key, title: labelFor(key), text: pptValueText(value) });
+            }
+            return blocks;
+        }
+
+        function groupPptContentBlocks(blocks) {
+            const groups = [];
+            let current = [];
+            let currentLength = 0;
+            blocks.forEach(block => {
+                const blockLength = block.title.length + block.text.length;
+                if (current.length && (current.length >= 3 || currentLength + blockLength > 1000)) {
+                    groups.push(current);
+                    current = [];
+                    currentLength = 0;
+                }
+                current.push(block);
+                currentLength += blockLength;
+            });
+            if (current.length) groups.push(current);
+            for (const [key, targetIndex] of [
+                ["anthem", 3], ["sermonTitleTxt", 5], ["benedictionTxt", 7], ["postludeTxt", 7]
+            ]) {
+                const sourceIndex = groups.findIndex(group => group.some(block => block.key === key));
+                if (sourceIndex === -1 || sourceIndex === targetIndex) continue;
+                const source = groups[sourceIndex];
+                const [block] = source.splice(source.findIndex(item => item.key === key), 1);
+                while (groups.length <= targetIndex) groups.push([]);
+                const insertIndex = groups[targetIndex].findIndex(item => blocks.indexOf(item) > blocks.indexOf(block));
+                if (insertIndex === -1) {
+                    groups[targetIndex].push(block);
+                } else {
+                    groups[targetIndex].splice(insertIndex, 0, block);
+                }
+            }
+
+            const sermonIndex = blocks.findIndex(block => block.key === "sermonTitleTxt");
+            const sermon = blocks.find(block => block.key === "sermonTitleTxt");
+            const prayer = blocks.find(block => block.key === "pastoralPrayer");
+            const announcements = blocks.filter(block => block.key === "announcements");
+            const followingBlocks = [];
+            groups.forEach((group, index) => {
+                groups[index] = group.filter(block => {
+                    if (block === sermon || block === prayer || block.key === "announcements") return false;
+                    if (index <= 5 && blocks.indexOf(block) > sermonIndex) {
+                        followingBlocks.push(block);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+            groups[4].push(...groups[5]);
+            if (!groups[4].length && groups[3].length > 1) {
+                groups[4].push(groups[3].pop());
+            }
+            groups[5] = [sermon, prayer].filter(Boolean);
+            const announcementGroups = [];
+            if (announcements.length) {
+                announcementGroups.push(announcements.slice(0, 2));
+                let extraGroup = [];
+                let extraLength = 0;
+                for (const announcement of announcements.slice(2)) {
+                    const length = announcement.title.length + announcement.text.length;
+                    if (extraGroup.length && (extraGroup.length >= 3 || extraLength + length > 1000)) {
+                        announcementGroups.push(extraGroup);
+                        extraGroup = [];
+                        extraLength = 0;
+                    }
+                    extraGroup.push(announcement);
+                    extraLength += length;
+                }
+                if (extraGroup.length) announcementGroups.push(extraGroup);
+            }
+            followingBlocks.sort((first, second) => blocks.indexOf(first) - blocks.indexOf(second));
+            groups.splice(6, 0, ...announcementGroups, ...(followingBlocks.length ? [followingBlocks] : []));
+            return groups.filter((group, index) => index <= 5 || group.length);
+        }
+
+        function createPptTitleSlide() {
+            const date = pptValueText(formatServiceDate(bulletinData.serviceDate));
+            const titleParagraphs = [
+                pptParagraph("Christ Moravian Church", {
+                    align: "ctr",
+                    bold: true,
+                    size: 3600,
+                    color: "26384A",
+                    after: 1200
+                })
+            ];
+            const subtitleParagraphs = [
+                pptParagraph("Sunday Worship", {
+                    align: "ctr",
+                    bold: true,
+                    size: 2600,
+                    color: "26384A",
+                    after: 900
+                }),
+                pptParagraph(date, {
+                    align: "ctr",
+                    size: 1800,
+                    after: 700
+                }),
+                pptParagraph("Our Lamb has conquered; let us follow Him.", {
+                    align: "ctr",
+                    italic: true,
+                    size: 1900,
+                    color: "53606D"
+                })
+            ];
+            const contactParagraphs = [
+                "Address: 600 Acadia Drive, Calgary, AB  T2J 0B8",
+                "Telephone: 403-271-2700",
+                "Office hours: Monday\u2013Friday, 9:00 a.m.\u20131:00 p.m.",
+                "email: moravian@nucleus.com",
+                "webpage: www.christmoravian.com"
+            ].map(text => pptParagraph(text, {
+                color: "555555",
+                size: 1400,
+                after: 500
+            }));
+            return pptSlideXml([
+                pptTextShape(2, "Church name", 600000, 450000, 10920000, 800000, titleParagraphs),
+                pptTextShape(3, "Worship details", 600000, 1450000, 10920000, 1800000, subtitleParagraphs),
+                pptTextShape(4, "Church contact information", 1600000, 3650000, 9200000, 2400000, contactParagraphs)
+            ]);
+        }
+
+        function createPptDetailsSlide() {
+            const rows = [];
+            for (let index = 0; index < pptDetailsKeys.length; index += 2) {
+                const cells = pptDetailsKeys.slice(index, index + 2).flatMap(key => [
+                    { text: labelFor(key), label: true },
+                    { text: wordTableValue(bulletinData[key]), label: false }
+                ]);
+                while (cells.length < 4) cells.push({ text: "", label: false });
+                rows.push(`<a:tr h="800000">${cells.map(cell => {
+                    const lines = String(cell.text).split(/\r?\n/);
+                    return `<a:tc>
+                        <a:txBody><a:bodyPr wrap="square"><a:normAutofit/></a:bodyPr><a:lstStyle/>
+                            ${lines.map(line => pptParagraph(line, {
+                                bold: cell.label, color: cell.label ? "26384A" : undefined
+                            })).join("")}
+                        </a:txBody>
+                        <a:tcPr marL="80000" marR="80000" marT="50000" marB="50000">
+                            ${["L", "R", "T", "B"].map(side =>
+                                `<a:ln${side} w="6350"><a:solidFill><a:srgbClr val="D5DBE1"/></a:solidFill></a:ln${side}>`
+                            ).join("")}
+                            <a:solidFill><a:srgbClr val="${cell.label ? "F4F6F8" : "FFFFFF"}"/></a:solidFill>
+                        </a:tcPr>
+                    </a:tc>`;
+                }).join("")}</a:tr>`);
+            }
+            const table = `
+                <p:graphicFrame>
+                    <p:nvGraphicFramePr><p:cNvPr id="3" name="Bulletin details"/>
+                        <p:cNvGraphicFramePr/><p:nvPr/></p:nvGraphicFramePr>
+                    <p:xfrm><a:off x="700000" y="1150000"/><a:ext cx="10800000" cy="4800000"/></p:xfrm>
+                    <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table">
+                        <a:tbl><a:tblPr/><a:tblGrid>
+                            <a:gridCol w="2200000"/><a:gridCol w="3200000"/>
+                            <a:gridCol w="2200000"/><a:gridCol w="3200000"/>
+                        </a:tblGrid>${rows.join("")}</a:tbl>
+                    </a:graphicData></a:graphic>
+                </p:graphicFrame>`;
+            return pptSlideXml([
+                pptTextShape(2, "Slide title", 650000, 300000, 10820000, 600000, [
+                    pptParagraph("Sunday Worship Team", { bold: true, size: 2400, color: "26384A", after: 1000 })
+                ]),
+                table,
+                pptTextShape(4, "Slide number", 10800000, 6500000, 600000, 350000, [
+                    pptParagraph("2", { align: "r", size: 1000, color: "697783" })
+                ])
+            ]);
+        }
+
+        function createPptContentSlide(group, slideNumber, originalSlideNumber = slideNumber) {
+            const title = [
+                pptParagraph("Sunday Worship", {
+                    bold: true,
+                    size: 2400,
+                    color: "26384A",
+                    after: 1000
+                })
+            ];
+            const content = [];
+            group.forEach(block => {
+                const hymn = /^(first|second|third)HymnNumber$/.test(block.key);
+                const inlineLabel = ["preludeTxt", "introit", "anthem", "sermonTitleTxt", "benedictionTxt", "postludeTxt"].includes(block.key) || hymn;
+                if (!inlineLabel) {
+                    content.push(pptParagraph(block.title, {
+                        bold: true,
+                        size: 2100,
+                        color: "26384A",
+                        after: 200
+                    }));
+                }
+                String(block.text).split(/\r?\n/).forEach((line, index) => {
+                    const [role, response] = block.key === "callToWorship" || gatheringPrayerKeys.has(block.key)
+                        ? (responsiveReadingRows(line)[0] || ["", line])
+                        : ["", line];
+                    content.push(pptParagraph(role ? `${role}\t${response}` : line, {
+                        after: 300,
+                        bold: isPeopleResponse(role),
+                        ...(role ? {
+                            indent: 1280160,
+                            firstLineIndent: -1280160,
+                            tabStop: 1280160
+                        } : {}),
+                        ...(inlineLabel && index === 0 ? {
+                            prefix: { text: `${block.title}${hymn ? " " : ": "}`, bold: true, size: 2100, color: "26384A" }
+                        } : {}),
+                        ...(block.key === "worshipToday" ? {
+                            align: "l",
+                            indent: 180000,
+                            lineSpacing: 150000,
+                            size: 1400,
+                            color: "000000",
+                            smallCaps: true
+                        } : {})
+                    }));
+                });
+                content.push(pptParagraph("", { size: 600, after: 300 }));
+            });
+            if (!content.length) content.push(pptParagraph(""));
+            const footer = [
+                pptParagraph(`${slideNumber}`, {
+                    align: "r",
+                    size: 1000,
+                    color: "697783"
+                })
+            ];
+            return pptSlideXml([
+                ...(originalSlideNumber >= 3 && originalSlideNumber <= 12 ? [] : [pptTextShape(2, "Slide title", 650000, 300000, 10820000, 600000, title)]),
+                pptTextShape(3, "Bulletin fields", 700000, 1050000, 10800000, 5450000, content),
+                pptTextShape(4, "Slide number", 10800000, 6500000, 600000, 350000, footer)
+            ]);
+        }
+
+        function wrapPptText(context, text, width) {
+            const maxWidth = (width - 200000) * 96 / 914400 * 0.9;
+            const lines = [];
+            String(text).split(/\r?\n/).forEach(paragraph => {
+                let line = "";
+                for (const character of paragraph) {
+                    if (line && context.measureText(line + character).width > maxWidth) {
+                        const breakAt = Math.max(line.lastIndexOf(" "), line.lastIndexOf("\t"));
+                        if (breakAt >= 0 && breakAt < line.length - 1) {
+                            lines.push(line.slice(0, breakAt + 1));
+                            line = line.slice(breakAt + 1);
+                        } else {
+                            lines.push(line);
+                            line = "";
+                        }
+                    }
+                    line += character;
+                }
+                lines.push(line);
+            });
+            return lines;
+        }
+
+        function createPptPrayerPages(blocks) {
+            const context = document.createElement("canvas").getContext("2d");
+            if (!context) throw new Error("Cannot measure prayer text for PowerPoint.");
+            context.font = `bold 24px "${pptDefaultFont}", Verdana, sans-serif`;
+            const pageHeight = 5150000;
+            const headingHeight = 410000;
+            const lineHeight = 380000;
+            const pages = [];
+            let page;
+
+            function newPage() {
+                page = { paragraphs: [], usedHeight: 0 };
+                pages.push(page);
+            }
+
+            function addHeading(title, continued) {
+                page.paragraphs.push(pptParagraph(continued ? `${title} (continued)` : title, {
+                    bold: true, size: 2100, color: "26384A", after: 200
+                }));
+                page.usedHeight += headingHeight;
+            }
+
+            newPage();
+            blocks.forEach(block => {
+                if (pageHeight - page.usedHeight < headingHeight + lineHeight) newPage();
+                addHeading(block.title, false);
+                String(block.text).split(/\r?\n/).forEach(line => {
+                    const [role, response] = responsiveReadingRows(line)[0] || ["", line];
+                    const width = role ? 10800000 - 1280160 : 10800000;
+                    const lines = wrapPptText(context, response, width);
+                    lines.forEach((text, index) => {
+                        if (pageHeight - page.usedHeight < lineHeight) {
+                            newPage();
+                            addHeading(block.title, true);
+                        }
+                        page.paragraphs.push(pptParagraph(role && index === 0 ? `${role}\t${text}` : text, {
+                            after: 300,
+                            bold: isPeopleResponse(role),
+                            ...(role ? {
+                                indent: 1280160,
+                                firstLineIndent: index === 0 ? -1280160 : 0,
+                                tabStop: 1280160
+                            } : {})
+                        }));
+                        page.usedHeight += lineHeight;
+                    });
+                });
+            });
+            return pages;
+        }
+
+        function createPptPrayerSlide(page, slideNumber) {
+            return pptSlideXml([
+                pptTextShape(2, "Prayer group", 700000, 1050000, 10800000, 5450000, page.paragraphs, "F4F6F8"),
+                pptTextShape(3, "Slide number", 10800000, 6500000, 600000, 350000, [
+                    pptParagraph(`${slideNumber}`, { align: "r", size: 1000, color: "697783" })
+                ])
+            ]);
+        }
+
+        function createPptTwoColumnPages(rows) {
+            const context = document.createElement("canvas").getContext("2d");
+            if (!context) throw new Error("Cannot measure two-column text for PowerPoint.");
+            context.font = `24px "${pptDefaultFont}", Verdana, sans-serif`;
+            const lineHeight = 300000;
+            const rowPadding = 100000;
+            const bottom = 6350000;
+            const pages = [];
+
+            function newPage() {
+                const first = pages.length === 0;
+                const page = { first, rows: [], nextY: first ? 1350000 : 850000 };
+                pages.push(page);
+                return page;
+            }
+
+            let page = newPage();
+            rows.forEach(row => {
+                const leftLines = wrapPptText(context, row.leftText, 3000000);
+                const rightLines = wrapPptText(context, row.rightText, 7800000);
+                let leftIndex = 0;
+                let rightIndex = 0;
+                while (leftIndex < leftLines.length || rightIndex < rightLines.length) {
+                    let capacity = Math.floor((bottom - page.nextY - rowPadding) / lineHeight);
+                    if (capacity < 1) {
+                        page = newPage();
+                        capacity = Math.floor((bottom - page.nextY - rowPadding) / lineHeight);
+                    }
+                    const lineCount = Math.min(capacity, Math.max(
+                        leftLines.length - leftIndex,
+                        rightLines.length - rightIndex
+                    ));
+                    const height = lineCount * lineHeight + rowPadding;
+                    page.rows.push({
+                        y: page.nextY,
+                        height,
+                        left: leftLines.slice(leftIndex, leftIndex + lineCount),
+                        right: rightLines.slice(rightIndex, rightIndex + lineCount)
+                    });
+                    leftIndex += lineCount;
+                    rightIndex += lineCount;
+                    page.nextY += height;
+                }
+            });
+            return pages;
+        }
+
+        function createPptTwoColumnSlide(page, slideNumber, labels) {
+            const headerY = page.first ? 850000 : 350000;
+            const headingStyle = { bold: true, size: 2100, color: "26384A" };
+            const shapes = [
+                ...(page.first ? [pptTextShape(2, labels.headingName, 700000, 300000, 10800000, 500000, [
+                    pptParagraph(labels.title, headingStyle)
+                ])] : []),
+                pptTextShape(3, `${labels.leftHeading} column heading`, 700000, headerY, 3000000, 400000, [
+                    pptParagraph(labels.leftHeading, headingStyle)
+                ]),
+                pptTextShape(4, `${labels.rightHeading} column heading`, 3700000, headerY, 7800000, 400000, [
+                    pptParagraph(labels.rightHeading, headingStyle)
+                ])
+            ];
+            page.rows.forEach((row, index) => {
+                const paragraphs = lines => (lines.length ? lines : [""]).map(line => pptParagraph(line, { after: 0 }));
+                shapes.push(
+                    pptTextShape(5 + index * 2, `${labels.leftName} ${index + 1}`, 700000, row.y, 3000000, row.height, paragraphs(row.left)),
+                    pptTextShape(6 + index * 2, `${labels.rightName} ${index + 1}`, 3700000, row.y, 7800000, row.height, paragraphs(row.right))
+                );
+            });
+            shapes.push(pptTextShape(5 + page.rows.length * 2, "Slide number", 10800000, 6500000, 600000, 350000, [
+                pptParagraph(`${slideNumber}`, { align: "r", size: 1000, color: "697783" })
+            ]));
+            return pptSlideXml(shapes);
+        }
+
+        function pptSlideMasterXml() {
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+                    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                    xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+                    <p:cSld><p:spTree>
+                        <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
+                        <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+                    </p:spTree></p:cSld>
+                    <p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
+                    <p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst>
+                    <p:txStyles>
+                        <p:titleStyle><a:lvl1pPr algn="ctr"><a:defRPr sz="3200" b="1"/></a:lvl1pPr></p:titleStyle>
+                        <p:bodyStyle><a:lvl1pPr>${pptDefaultRunProperties}</a:lvl1pPr></p:bodyStyle>
+                        <p:otherStyle><a:defPPr>${pptDefaultRunProperties}</a:defPPr></p:otherStyle>
+                    </p:txStyles>
+                </p:sldMaster>`;
+        }
+
+        function pptThemeXml() {
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Christ Moravian">
+                    <a:themeElements>
+                        <a:clrScheme name="Christ Moravian">
+                            <a:dk1><a:srgbClr val="000000"/></a:dk1>
+                            <a:lt1><a:srgbClr val="FFFFFF"/></a:lt1>
+                            <a:dk2><a:srgbClr val="26384A"/></a:dk2>
+                            <a:lt2><a:srgbClr val="F4F6F8"/></a:lt2>
+                            <a:accent1><a:srgbClr val="26384A"/></a:accent1>
+                            <a:accent2><a:srgbClr val="53606D"/></a:accent2>
+                            <a:accent3><a:srgbClr val="8C7A5B"/></a:accent3>
+                            <a:accent4><a:srgbClr val="A8B5C0"/></a:accent4>
+                            <a:accent5><a:srgbClr val="D5DBE1"/></a:accent5>
+                            <a:accent6><a:srgbClr val="697783"/></a:accent6>
+                            <a:hlink><a:srgbClr val="0563C1"/></a:hlink>
+                            <a:folHlink><a:srgbClr val="954F72"/></a:folHlink>
+                        </a:clrScheme>
+                        <a:fontScheme name="Office">
+                            <a:majorFont><a:latin typeface="${pptDefaultFont}"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>
+                            <a:minorFont><a:latin typeface="${pptDefaultFont}"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont>
+                        </a:fontScheme>
+                        <a:fmtScheme name="Office">
+                            <a:fillStyleLst>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                            </a:fillStyleLst>
+                            <a:lnStyleLst>
+                                <a:ln w="6350"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+                                <a:ln w="12700"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+                                <a:ln w="19050"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+                            </a:lnStyleLst>
+                            <a:effectStyleLst>
+                                <a:effectStyle><a:effectLst/></a:effectStyle>
+                                <a:effectStyle><a:effectLst/></a:effectStyle>
+                                <a:effectStyle><a:effectLst/></a:effectStyle>
+                            </a:effectStyleLst>
+                            <a:bgFillStyleLst>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                                <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+                            </a:bgFillStyleLst>
+                        </a:fmtScheme>
+                    </a:themeElements>
+                    <a:objectDefaults/><a:extraClrSchemeLst/>
+                </a:theme>`;
+        }
+
+        function minifyXml(xml) {
+            return xml.trim();
+        }
+
+        function createPptxBlob() {
+            const verseHymnKeys = ["firstHymnNumber", "secondHymnNumber", "thirdHymnNumber"];
+            const blocks = createPptContentBlocks();
+            const scriptureBlocks = blocks.filter(block => block.key === "scriptureReadings");
+            const announcementBlocks = blocks.filter(block => block.key === "announcements");
+            const twoColumnSections = new Map();
+            if (scriptureBlocks.length) {
+                twoColumnSections.set("scriptureReadings", {
+                    pages: createPptTwoColumnPages(scriptureBlocks.map(block => ({
+                        leftText: block.verseText, rightText: block.focusText
+                    }))),
+                    labels: {
+                        title: "Scripture Reading(s)", headingName: "Scripture heading",
+                        leftHeading: "Verse", rightHeading: "Scripture focus",
+                        leftName: "Scripture verse", rightName: "Scripture focus"
+                    }
+                });
+            }
+            if (announcementBlocks.length) {
+                twoColumnSections.set("announcements", {
+                    pages: createPptTwoColumnPages(announcementBlocks.map(block => ({
+                        leftText: block.dateText, rightText: block.descriptionText
+                    }))),
+                    labels: {
+                        title: "Announcements", headingName: "Announcements heading",
+                        leftHeading: "Date", rightHeading: "Description",
+                        leftName: "Announcement date", rightName: "Announcement description"
+                    }
+                });
+            }
+            const insertedSections = new Set();
+            const prayerBlocks = blocks.filter(block => gatheringPrayerKeys.has(block.key));
+            const extraPrayers = prayerBlocks.filter(block => block.key !== "gatheringPrayer");
+            const prayerPages = prayerBlocks.length ? createPptPrayerPages(prayerBlocks) : [];
+            const baseGroups = groupPptContentBlocks(blocks.filter(block => !extraPrayers.includes(block)));
+            const prayerAnchor = blocks.some(block => block.key === "gatheringPrayer")
+                ? "gatheringPrayer" : "firstHymnNumber";
+            const groups = baseGroups.flatMap((group, index) => {
+                const anchorIndex = prayerPages.length ? group.findIndex(block => block.key === prayerAnchor) : -1;
+                if (anchorIndex === -1) return [{ group, index }];
+                const before = group.slice(0, anchorIndex + (prayerAnchor === "gatheringPrayer" ? 0 : 1));
+                const after = group.slice(anchorIndex + 1);
+                return [
+                    ...(before.length ? [{ group: before, index }] : []),
+                    ...prayerPages.map(prayerPage => ({ prayerPage, index })),
+                    ...(after.length ? [{ group: after, index }] : [])
+                ];
+            });
+            const contentGroups = groups.flatMap(({ group, index, prayerPage }) => {
+                if (prayerPage) return [{ prayerPage }];
+                const splitGroups = [];
+                let current = [];
+                group.forEach(block => {
+                    if (twoColumnSections.has(block.key)) {
+                        if (!insertedSections.has(block.key)) {
+                            if (current.length) splitGroups.push(current);
+                            current = [];
+                            splitGroups.push([block]);
+                            insertedSections.add(block.key);
+                        }
+                    } else if (block.key === "callToWorship" || verseHymnKeys.includes(block.key)) {
+                        if (current.length) splitGroups.push(current);
+                        splitGroups.push([block]);
+                        current = [];
+                    } else {
+                        current.push(block);
+                    }
+                });
+                if (current.length) splitGroups.push(current);
+                if (!splitGroups.length && !group.length) splitGroups.push(group);
+                return splitGroups.flatMap(splitGroup => {
+                    if (splitGroup.length === 1 && twoColumnSections.has(splitGroup[0].key)) {
+                        const section = twoColumnSections.get(splitGroup[0].key);
+                        return section.pages.map(page => ({ twoColumnPage: page, labels: section.labels }));
+                    }
+                    if (splitGroup.length === 1 && verseHymnKeys.includes(splitGroup[0].key)) {
+                        return Array.from({ length: 5 }, (_, verseIndex) => ({
+                            group: [{
+                                ...splitGroup[0],
+                                text: `${splitGroup[0].text} verse ${verseIndex + 1}`
+                            }],
+                            originalSlideNumber: index + 3
+                        }));
+                    }
+                    return [{ group: splitGroup, originalSlideNumber: index + 3 }];
+                });
+            });
+            const slideXmls = [
+                createPptTitleSlide(),
+                createPptDetailsSlide(),
+                ...contentGroups.map(({ group, originalSlideNumber, twoColumnPage, labels, prayerPage }, index) =>
+                    prayerPage
+                        ? createPptPrayerSlide(prayerPage, index + 3)
+                        : twoColumnPage
+                        ? createPptTwoColumnSlide(twoColumnPage, index + 3, labels)
+                        : createPptContentSlide(group, index + 3, originalSlideNumber)
+                )
+            ];
+            const presentationRelationships = [
+                `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>`,
+                ...slideXmls.map((_, index) =>
+                    `<Relationship Id="rId${index + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${index + 1}.xml"/>`
+                )
+            ];
+            const slideIds = slideXmls.map((_, index) =>
+                `<p:sldId id="${256 + index}" r:id="rId${index + 2}"/>`
+            ).join("");
+            const contentOverrides = [
+                `<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>`,
+                `<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>`,
+                `<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>`,
+                `<Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>`,
+                ...slideXmls.map((_, index) =>
+                    `<Override PartName="/ppt/slides/slide${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>`
+                )
+            ];
+            const files = [
+                {
+                    name: "[Content_Types].xml",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+                            <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+                            <Default Extension="xml" ContentType="application/xml"/>
+                            ${contentOverrides.join("")}
+                        </Types>`)
+                },
+                {
+                    name: "_rels/.rels",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                            <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+                        </Relationships>`)
+                },
+                {
+                    name: "ppt/presentation.xml",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+                            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                            xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+                            <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
+                            <p:sldIdLst>${slideIds}</p:sldIdLst>
+                            <p:sldSz cx="12192000" cy="6858000" type="screen16x9"/>
+                            <p:notesSz cx="6858000" cy="9144000"/>
+                            <p:defaultTextStyle><a:defPPr>${pptDefaultRunProperties}</a:defPPr></p:defaultTextStyle>
+                        </p:presentation>`)
+                },
+                {
+                    name: "ppt/_rels/presentation.xml.rels",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                            ${presentationRelationships.join("")}
+                        </Relationships>`)
+                },
+                {
+                    name: "ppt/slideMasters/slideMaster1.xml",
+                    content: minifyXml(pptSlideMasterXml())
+                },
+                {
+                    name: "ppt/slideMasters/_rels/slideMaster1.xml.rels",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                            <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+                            <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/>
+                        </Relationships>`)
+                },
+                {
+                    name: "ppt/slideLayouts/slideLayout1.xml",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+                            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                            xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
+                            type="blank" preserve="1">
+                            <p:cSld name="Blank"><p:spTree>
+                                <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
+                                <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+                            </p:spTree></p:cSld>
+                            <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+                        </p:sldLayout>`)
+                },
+                {
+                    name: "ppt/slideLayouts/_rels/slideLayout1.xml.rels",
+                    content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                            <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/>
+                        </Relationships>`)
+                },
+                { name: "ppt/theme/theme1.xml", content: minifyXml(pptThemeXml()) },
+                ...slideXmls.flatMap((content, index) => [
+                    { name: `ppt/slides/slide${index + 1}.xml`, content: minifyXml(content) },
+                    {
+                        name: `ppt/slides/_rels/slide${index + 1}.xml.rels`,
+                        content: minifyXml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                                <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+                            </Relationships>`)
+                    }
+                ])
+            ];
+            return createZipBlob(
+                files,
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            );
+        }
+
+        function exportPowerPointPresentation() {
+            let blob;
+            try {
+                blob = createPptxBlob();
+            } catch (error) {
+                console.error("PowerPoint export failed:", error);
+                status.textContent = `Could not export PowerPoint: ${error.message}`;
+                return;
+            }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const serviceDate = String(bulletinData.serviceDate || "").replace(/[^0-9-]/g, "");
+            link.href = url;
+            link.download = serviceDate
+                ? `church-bulletin-${serviceDate}.pptx`
+                : "church-bulletin.pptx";
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            status.textContent = "Microsoft PowerPoint presentation exported.";
+        }
+
+        function exportWordDocument() {
+            const blob = createDocxBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const serviceDate = String(bulletinData.serviceDate || "").replace(/[^0-9-]/g, "");
+            link.href = url;
+            link.download = serviceDate
+                ? `church-bulletin-${serviceDate}.docx`
+                : "church-bulletin.docx";
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            status.textContent = "Microsoft Word document exported.";
+        }
+
+        function setValueAtPath(path, value) {
+            let current = bulletinData;
+            for (const part of path.slice(0, -1)) {
+                current = current[part];
+            }
+            current[path[path.length - 1]] = value;
+        }
+
+        function formatLeaderPeopleLines(value, caretPosition) {
+            let roleIndex = 0;
+            let oldOffset = 0;
+            let newOffset = 0;
+            let formattedCaret = value.length;
+            const formattedLines = value.split("\n").map(line => {
+                const match = line.match(/^(Leader|People):\s*/i);
+                const content = match ? line.slice(match[0].length) : line;
+                const hasContent = Boolean(content.trim());
+                const prefix = hasContent
+                    ? `${roleIndex++ % 2 === 0 ? "Leader" : "People"}: `
+                    : match ? `${roleIndex % 2 === 0 ? "Leader" : "People"}: ` : "";
+                const formattedLine = prefix + content;
+
+                if (caretPosition >= oldOffset && caretPosition <= oldOffset + line.length) {
+                    const positionInLine = caretPosition - oldOffset;
+                    const contentOffset = match ? match[0].length : 0;
+                    formattedCaret = newOffset + prefix.length + Math.max(
+                        0,
+                        Math.min(content.length, positionInLine - contentOffset)
+                    );
+                }
+
+                oldOffset += line.length + 1;
+                newOffset += formattedLine.length + 1;
+                return formattedLine;
+            });
+
+            return { value: formattedLines.join("\n"), caretPosition: formattedCaret };
+        }
+
+        function emptyLike(value, key) {
+            if (key === "announcements" && !value) {
+                return { date: "", text: "" };
+            }
+            if (Array.isArray(value)) return [];
+            if (value && typeof value === "object") {
+                return Object.fromEntries(Object.keys(value).map(childKey => [
+                    childKey,
+                    childKey.toLowerCase().includes("date") ? "" : emptyLike(value[childKey], childKey)
+                ]));
+            }
+            if (key && key.toLowerCase().includes("date")) return "";
+            return "";
+        }
+
+        function createField(key, value, path) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "field";
+
+            if (key === "highlights" && Array.isArray(value)) {
+                const fieldLabel = document.createElement("label");
+                fieldLabel.textContent = labelFor(key);
+                const select = document.createElement("select");
+                select.id = `field-${path.map(String).join("-")}`;
+                fieldLabel.htmlFor = select.id;
+                const placeholderOption = new Option("Choose the Highlight for this service", "");
+                placeholderOption.disabled = true;
+                select.add(placeholderOption);
+                const highlightOptions = ["Communion", "Noisy Offering"];
+                highlightOptions.forEach(option => select.add(new Option(option, option)));
+
+                const currentValue = value[0] == null ? "" : String(value[0]);
+                if (currentValue && !highlightOptions.includes(currentValue)) {
+                    select.add(new Option(currentValue, currentValue));
+                }
+                if (currentValue) {
+                    select.value = currentValue;
+                } else {
+                    select.selectedIndex = 0;
+                }
+                select.addEventListener("change", () => {
+                    setValueAtPath(path, select.value ? [select.value] : []);
+                });
+                wrapper.append(fieldLabel, select);
+                return wrapper;
+            }
+
+            if (key === "accompanists" && Array.isArray(value)) {
+                const fieldLabel = document.createElement("label");
+                fieldLabel.textContent = labelFor(key);
+                const select = document.createElement("select");
+                select.id = `field-${path.map(String).join("-")}`;
+                select.multiple = true;
+                select.size = 6;
+
+                const accompanistOptions = [
+                    "Gaylene Hennan",
+                    "Jean Hergert",
+                    "Linda Jablonski",
+                    "Joan Glasgow",
+                    "Cathy Pepers",
+                    "Dunc McKerchar"
+                ];
+                const selectedNames = value.map(String);
+                const availableNames = [...accompanistOptions];
+                selectedNames.forEach(name => {
+                    if (!availableNames.includes(name)) availableNames.push(name);
+                });
+                availableNames.forEach(name => {
+                    const option = new Option(name, name);
+                    option.selected = selectedNames.includes(name);
+                    select.add(option);
+                });
+
+                select.addEventListener("change", () => {
+                    setValueAtPath(
+                        path,
+                        Array.from(select.selectedOptions, option => option.value)
+                    );
+                });
+                wrapper.append(fieldLabel, select);
+                const helpText = document.createElement("small");
+                helpText.textContent = "Select multiple names with Ctrl (Windows) or Command (Mac).";
+                wrapper.appendChild(helpText);
+                return wrapper;
+            }
+
+            if (Array.isArray(value)) {
+                const heading = document.createElement("h2");
+                heading.textContent = labelFor(key);
+                wrapper.appendChild(heading);
+
+                value.forEach((item, index) => {
+                    const itemRow = document.createElement("div");
+                    itemRow.className = "field-row";
+                    const itemContainer = document.createElement("div");
+                    itemContainer.className = "array-item";
+                    renderValue(itemContainer, String(index + 1), item, [...path, index]);
+
+                    const removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.className = "remove-button";
+                    removeButton.textContent = "Remove";
+                    removeButton.setAttribute("aria-label", `Remove ${labelFor(key)} ${index + 1}`);
+                    removeButton.addEventListener("click", () => {
+                        value.splice(index, 1);
+                        renderForm();
+                    });
+
+                    itemRow.append(itemContainer, removeButton);
+                    wrapper.appendChild(itemRow);
+                });
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.textContent = `Add ${labelFor(key).replace(/s$/, "")}`;
+                addButton.addEventListener("click", () => {
+                    value.push(emptyLike(value[0], key));
+                    renderForm();
+                });
+                wrapper.appendChild(addButton);
+                return wrapper;
+            }
+
+            renderValue(wrapper, key, value, path);
+            return wrapper;
+        }
+
+        function renderValue(container, key, value, path) {
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+                const heading = document.createElement("h3");
+                heading.textContent = labelFor(key);
+                container.appendChild(heading);
+                for (const [childKey, childValue] of Object.entries(value)) {
+                    container.appendChild(createField(childKey, childValue, [...path, childKey]));
+                }
+                return;
+            }
+
+            const fieldLabel = document.createElement("label");
+            fieldLabel.textContent = labelFor(key);
+            const selectConfig = selectOptions[key];
+            const input = selectConfig
+                ? document.createElement("select")
+                : document.createElement(
+                    key.toLowerCase().includes("date") ? "input" :
+                    multilineFields.has(key) || (typeof value === "string" && value.includes("\n"))
+                        ? "textarea"
+                        : "input"
+                );
+            if (input.tagName === "INPUT") {
+                input.type = key.toLowerCase().includes("date") ? "date" : "text";
+            }
+            if (key === "childrensMoment") {
+                input.placeholder = "Who is the Children's Moment Leader";
+            }
+            if (key === "specialMusic") {
+                input.placeholder = "Who is performing special music";
+            }
+            if (key === "scriptureReader") {
+                input.placeholder = "Who is the scripture reader this Sunday?";
+            }
+            if (key === "preludeTxt") {
+                input.placeholder = "Enter the music title or musicians name?";
+            }
+            if (key === "greeters") {
+                input.placeholder = "Who are our Greeters this Sunday? ";
+            }
+            if (key === "coffeeService") {
+                input.placeholder = "Who is providing Coffee Service? ";
+            }
+            if (key === "sundaySchool") {
+                input.placeholder = "Who is leading Sunday School? ";
+            }
+            if (key === "benedictionTxt") {
+                input.placeholder = "Enter a Benediction Prayer";
+            }
+            if (key === "postludeTxt") {
+                input.placeholder = "Enter Music title or Musicians name";
+            }
+            if (key === "sermonTitleTxt") {
+                input.placeholder = "Enter Sermon Title";
+            }
+            if (key === "callToWorship" || gatheringPrayerKeys.has(key)) {
+                input.placeholder = "Enter text one line at a time ";
+            }
+            if (key === "gatheringPrayer" && path.length === 1) {
+                input.placeholder = "Select the appropriate title for the dropdown list above.\nEnter or paste the congregation prayer";
+            }
+            if ((key === "gatheringPrayer2" || key === "gatheringPrayer3") && path.length === 1) {
+                input.placeholder = "OPTIONAL:\nSelect the appropriate title for the dropdown list above.\nEnter or paste the congregation prayer";
+                input.rows = 3;
+            }
+            if (key === "sanctuaryFlowers") {
+                input.placeholder = "Who has provided the Sanctuary Flowers? ";
+            }
+            if (path[0] === "scriptureReadings") {
+                input.placeholder = "Enter scripture verse";
+            }
+            if (input.tagName === "SELECT") {
+                input.add(new Option(selectConfig.placeholder, ""));
+                selectConfig.options.forEach(option => input.add(new Option(option, option)));
+                const currentValue = value == null ? "" : String(value);
+                if (currentValue && !selectConfig.options.includes(currentValue)) {
+                    input.add(new Option(currentValue, currentValue));
+                }
+                input.value = currentValue;
+            } else {
+                input.value = value == null ? "" : String(value);
+            }
+            input.addEventListener(input.tagName === "SELECT" ? "change" : "input", () => {
+                if (key === "callToWorship" || gatheringPrayerKeys.has(key)) {
+                    const formatted = formatLeaderPeopleLines(input.value, input.selectionStart);
+                    if (formatted.value !== input.value) {
+                        input.value = formatted.value;
+                        input.setSelectionRange(formatted.caretPosition, formatted.caretPosition);
+                    }
+                }
+                setValueAtPath(path, input.value);
+            });
+            fieldLabel.htmlFor = `field-${path.map(String).join("-")}`;
+            input.id = fieldLabel.htmlFor;
+            if (gatheringPrayerKeys.has(key) && path.length === 1) {
+                const fieldIndex = gatheringPrayerFields.findIndex(field => field.key === key);
+                const headingKey = gatheringPrayerFields[fieldIndex].headingKey;
+                const headingSelect = document.createElement("select");
+                headingSelect.id = `field-${headingKey}`;
+                const fieldSuffix = fieldIndex ? ` ${fieldIndex + 1}` : "";
+                headingSelect.setAttribute("aria-label", `Gathering Prayer heading${fieldSuffix}`);
+                headingSelect.add(new Option("Select a heading", ""));
+                gatheringPrayerHeadings.forEach(heading => headingSelect.add(new Option(heading, heading)));
+                const currentHeading = bulletinData[headingKey];
+                if (currentHeading && !gatheringPrayerHeadings.includes(currentHeading)) {
+                    headingSelect.add(new Option(currentHeading, currentHeading));
+                }
+                headingSelect.value = currentHeading || "";
+                input.setAttribute("aria-label", `${labelFor(key)} text${fieldSuffix}`);
+                headingSelect.addEventListener("change", () => {
+                    setValueAtPath([headingKey], headingSelect.value);
+                    input.setAttribute("aria-label", `${labelFor(key)} text${fieldSuffix}`);
+                });
+                container.append(headingSelect, input);
+            } else {
+                container.append(fieldLabel, input);
+            }
+
+            if (key === "sanctuaryFlowers") {
+                const buttonRow = document.createElement("div");
+                buttonRow.className = "toolbar";
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.textContent = "Add New";
+                addButton.addEventListener("click", () => {
+                    input.value = "";
+                    setValueAtPath(path, "");
+                    input.focus();
+                    updateLivePreview();
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.textContent = "Delete Existing";
+                deleteButton.addEventListener("click", () => {
+                    if (!input.value || !confirm("Delete the current Sanctuary Flowers entry?")) return;
+                    input.value = "";
+                    setValueAtPath(path, "");
+                    updateLivePreview();
+                });
+
+                buttonRow.append(addButton, deleteButton);
+                container.appendChild(buttonRow);
+            }
+        }
+
+        function createHymnFields(title, numberKey, bookKey, titleKey) {
+            const wrapper = document.createElement("section");
+            wrapper.className = "field";
+
+            const heading = document.createElement("h2");
+            heading.textContent = title;
+            wrapper.appendChild(heading);
+
+            const fields = document.createElement("div");
+            fields.className = "hymn-fields";
+            [
+                { key: numberKey, label: "Number", maxLength: 4, inputMode: "numeric" },
+                { key: bookKey, label: "Book", maxLength: 3 },
+                { key: titleKey, label: "Title", maxLength: 80 }
+            ].forEach(({ key, label, maxLength, inputMode }) => {
+                const group = document.createElement("div");
+                const fieldLabel = document.createElement("label");
+                const input = document.createElement("input");
+                input.type = "text";
+                input.maxLength = maxLength;
+                if (inputMode) input.inputMode = inputMode;
+                input.id = `field-${key}`;
+                input.value = bulletinData[key] == null ? "" : String(bulletinData[key]);
+                fieldLabel.htmlFor = input.id;
+                fieldLabel.textContent = label;
+                input.addEventListener("input", () => {
+                    setValueAtPath([key], input.value);
+                });
+                group.append(fieldLabel, input);
+                fields.appendChild(group);
+            });
+
+            wrapper.appendChild(fields);
+            return wrapper;
+        }
+
+        function createScriptureReadingsField() {
+            const wrapper = document.createElement("section");
+            wrapper.className = "field";
+
+            const heading = document.createElement("h2");
+            heading.textContent = "Scripture Readings";
+            wrapper.appendChild(heading);
+
+            bulletinData.scriptureReadings.forEach((reading, index) => {
+                const row = document.createElement("div");
+                row.className = "scripture-entry";
+
+                const readingGroup = document.createElement("div");
+                const readingLabel = document.createElement("label");
+                const readingInput = document.createElement("input");
+                readingInput.type = "text";
+                readingInput.id = `field-scripture-reading-${index}`;
+                readingInput.placeholder = "Enter scripture verse";
+                readingInput.value = reading == null ? "" : String(reading);
+                readingLabel.htmlFor = readingInput.id;
+                readingLabel.textContent = `Scripture Readings ${index + 1}`;
+                readingInput.addEventListener("input", () => {
+                    bulletinData.scriptureReadings[index] = readingInput.value;
+                });
+                readingGroup.append(readingLabel, readingInput);
+
+                const focusGroup = document.createElement("div");
+                const focusLabel = document.createElement("label");
+                const focusInput = document.createElement("textarea");
+                focusInput.id = `field-scripture-focus-${index}`;
+                focusInput.value = bulletinData.scriptureFocus[index] || "";
+                focusLabel.htmlFor = focusInput.id;
+                focusLabel.textContent = `Scripture focus ${index + 1}`;
+                focusInput.addEventListener("input", () => {
+                    bulletinData.scriptureFocus[index] = focusInput.value;
+                });
+                focusGroup.append(focusLabel, focusInput);
+
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "remove-button";
+                removeButton.textContent = "Remove";
+                removeButton.setAttribute(
+                    "aria-label",
+                    `Remove Scripture Reading and focus ${index + 1}`
+                );
+                removeButton.addEventListener("click", () => {
+                    bulletinData.scriptureReadings.splice(index, 1);
+                    bulletinData.scriptureFocus.splice(index, 1);
+                    renderForm();
+                });
+
+                row.append(readingGroup, focusGroup, removeButton);
+                wrapper.appendChild(row);
+            });
+
+            const addButton = document.createElement("button");
+            addButton.type = "button";
+            addButton.textContent = "Add Scripture Reading";
+            addButton.addEventListener("click", () => {
+                bulletinData.scriptureReadings.push("");
+                bulletinData.scriptureFocus.push("");
+                renderForm();
+            });
+            wrapper.appendChild(addButton);
+            return wrapper;
+        }
+
+        function createWelcomeFieldsTable() {
+            const table = document.createElement("table");
+            table.className = "welcome-fields-table";
+            table.setAttribute("aria-label", "Welcome and worship opening");
+
+            const body = document.createElement("tbody");
+            for (const labelText of welcomeLabels) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.textContent = labelText;
+                row.appendChild(cell);
+                body.appendChild(row);
+            }
+
+            table.appendChild(body);
+            return table;
+        }
+
+        function renderForm() {
+            form.replaceChildren();
+            let scriptureReaderRendered = false;
+            let openingSectionRendered = false;
+            for (const [key, value] of Object.entries(bulletinData)) {
+                if (gatheringPrayerHeadingKeys.has(key)) continue;
+                if (gatheringPrayerKeys.has(key)) {
+                    if (key === "gatheringPrayer") {
+                        const group = document.createElement("fieldset");
+                        group.className = "prayer-group";
+                        const legend = document.createElement("legend");
+                        legend.textContent = "Prayer and Confession";
+                        group.appendChild(legend);
+                        gatheringPrayerFields.forEach(field => {
+                            group.appendChild(createField(field.key, bulletinData[field.key], [field.key]));
+                        });
+                        form.appendChild(group);
+                    }
+                    continue;
+                }
+                if (key === "highlights") continue;
+                if (key === "childrensMoment") continue;
+                if (key === "sundaySchool") continue;
+                if (key === "scriptureReader") continue;
+                if (
+                    key === "wordsOfWelcome" ||
+                    key === "sharingChristsPeace" ||
+                    key === "lightingChristCandle"
+                ) continue;
+                if (key === "preludeTxt" || key === "introit" || key === "callToWorship") {
+                    if (!openingSectionRendered) {
+                        form.appendChild(createField(
+                            "preludeTxt",
+                            bulletinData.preludeTxt,
+                            ["preludeTxt"]
+                        ));
+                        form.appendChild(createField(
+                            "introit",
+                            bulletinData.introit,
+                            ["introit"]
+                        ));
+                        form.appendChild(createWelcomeFieldsTable());
+                        form.appendChild(createField(
+                            "callToWorship",
+                            bulletinData.callToWorship,
+                            ["callToWorship"]
+                        ));
+                        openingSectionRendered = true;
+                    }
+                    continue;
+                }
+                if (key === "scriptureReadings") {
+                    form.appendChild(createScriptureReadingsField());
+                    continue;
+                }
+                if (key === "scriptureFocus") continue;
+                if (key === "firstHymnNumber") {
+                    form.appendChild(createHymnFields(
+                        "First Hymn",
+                        "firstHymnNumber",
+                        "firstHymnBook",
+                        "firstHymnTitle"
+                    ));
+                    continue;
+                }
+                if (key === "firstHymnBook" || key === "firstHymnTitle") continue;
+                if (key === "secondHymnNumber") {
+                    form.appendChild(createHymnFields(
+                        "Second Hymn",
+                        "secondHymnNumber",
+                        "secondHymnBook",
+                        "secondHymnTitle"
+                    ));
+                    continue;
+                }
+                if (key === "secondHymnBook" || key === "secondHymnTitle") continue;
+                if (key === "thirdHymnNumber") {
+                    form.appendChild(createHymnFields(
+                        "Third Hymn",
+                        "thirdHymnNumber",
+                        "thirdHymnBook",
+                        "thirdHymnTitle"
+                    ));
+                    continue;
+                }
+                if (key === "thirdHymnBook" || key === "thirdHymnTitle") continue;
+                form.appendChild(createField(key, value, [key]));
+                if (key === "specialMusic") {
+                    if (Object.prototype.hasOwnProperty.call(bulletinData, "scriptureReader")) {
+                        form.appendChild(createField(
+                            "scriptureReader",
+                            bulletinData.scriptureReader,
+                            ["scriptureReader"]
+                        ));
+                        scriptureReaderRendered = true;
+                    }
+                }
+                if (key === "coffeeService") {
+                    form.appendChild(createField(
+                        "Children's Moment",
+                        bulletinData.childrensMoment,
+                        ["childrensMoment"]
+                    ));
+                    form.appendChild(createField(
+                        "Sunday School",
+                        bulletinData.sundaySchool,
+                        ["sundaySchool"]
+                    ));
+                    form.appendChild(createField(
+                        "highlights",
+                        bulletinData.highlights,
+                        ["highlights"]
+                    ));
+                }
+            }
+            if (!openingSectionRendered) {
+                form.appendChild(createField(
+                    "preludeTxt",
+                    bulletinData.preludeTxt,
+                    ["preludeTxt"]
+                ));
+                form.appendChild(createField(
+                    "introit",
+                    bulletinData.introit,
+                    ["introit"]
+                ));
+                form.appendChild(createWelcomeFieldsTable());
+                form.appendChild(createField(
+                    "Call to Worship",
+                    bulletinData.callToWorship,
+                    ["callToWorship"]
+                ));
+            }
+            if (
+                !scriptureReaderRendered &&
+                Object.prototype.hasOwnProperty.call(bulletinData, "scriptureReader")
+            ) {
+                form.appendChild(createField(
+                    "scriptureReader",
+                    bulletinData.scriptureReader,
+                    ["scriptureReader"]
+                ));
+            }
+            exportButton.disabled = false;
+            wordExportButton.disabled = false;
+            pptExportButton.disabled = false;
+            updateLivePreview();
+        }
+
+        form.addEventListener("input", updateLivePreview);
+        form.addEventListener("change", updateLivePreview);
+
+        function clearBulletinValues(value, key) {
+            if (Array.isArray(value)) {
+                if (key === "accompanists" || key === "highlights") return [];
+                return value.map(item => clearBulletinValues(item));
+            }
+            if (value && typeof value === "object") {
+                return Object.fromEntries(Object.entries(value).map(([childKey, childValue]) => [
+                    childKey, clearBulletinValues(childValue, childKey)
+                ]));
+            }
+            return "";
+        }
+
+        clearButton.addEventListener("click", () => {
+            if (!confirm("Clear all bulletin contents? This cannot be undone.")) return;
+            fileLoadVersion++;
+            fileInput.value = "";
+            bulletinData = bulletinData ? clearBulletinValues(bulletinData) : createEmptyBulletinData();
+            renderForm();
+            status.textContent = "All bulletin contents cleared.";
+        });
+
+        fileInput.addEventListener("change", async () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            const loadVersion = ++fileLoadVersion;
+
+            try {
+                const parsed = JSON.parse(await file.text());
+                if (loadVersion !== fileLoadVersion) return;
+                if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") {
+                    throw new Error("The JSON root must be an object.");
+                }
+                delete parsed.serviceTime;
+                delete parsed.wordsOfWelcome;
+                delete parsed.sharingChristsPeace;
+                delete parsed.lightingChristCandle;
+                for (const [key, value] of Object.entries(createEmptyBulletinData())) {
+                    if (!Object.prototype.hasOwnProperty.call(parsed, key)) {
+                        parsed[key] = value;
+                    }
+                }
+                const scriptureReadings = Array.isArray(parsed.scriptureReadings)
+                    ? parsed.scriptureReadings
+                    : [];
+                const existingFocus = Array.isArray(parsed.scriptureFocus)
+                    ? parsed.scriptureFocus
+                    : parsed.scriptureFocus == null || parsed.scriptureFocus === ""
+                        ? []
+                        : [parsed.scriptureFocus];
+                parsed.scriptureFocus = scriptureReadings.map((_, index) =>
+                    existingFocus[index] == null ? "" : String(existingFocus[index])
+                );
+                bulletinData = parsed;
+                renderForm();
+                status.textContent = `Loaded ${file.name}.`;
+            } catch (error) {
+                if (loadVersion !== fileLoadVersion) return;
+                bulletinData = null;
+                form.replaceChildren();
+                exportButton.disabled = true;
+                wordExportButton.disabled = true;
+                pptExportButton.disabled = true;
+                updateLivePreview();
+                status.textContent = `Could not load JSON: ${error.message}`;
+            }
+        });
+
+        exportButton.addEventListener("click", () => {
+            const blob = new Blob([JSON.stringify(bulletinData, null, 2)], {
+                type: "application/json"
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "bulletin-data.json";
+            link.click();
+            URL.revokeObjectURL(url);
+            status.textContent = "Bulletin JSON exported.";
+        });
+
+        wordExportButton.addEventListener("click", exportWordDocument);
+        pptExportButton.addEventListener("click", exportPowerPointPresentation);
+
+        renderForm();
+    </script>
+</body>
+</html>
